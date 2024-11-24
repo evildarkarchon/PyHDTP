@@ -1,5 +1,4 @@
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -9,17 +8,13 @@ def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Texture Pack File Management Script")
 
-    parser.add_argument("--base-path", type=str, required=True, help="Base path where all texture folders are located")
+    parser.add_argument("--base-path", type=str, default=str(Path.cwd()), required=True, help="Base path where all texture folders are located")
 
-    parser.add_argument("--combined-dir", type=str, default="Combined_Files", help="Name of the output directory (default: Combined_Files)")
+    parser.add_argument("--combined-dir", type=str, default=str(Path.cwd() / "Combined_Files"), help="Name of the output directory (default: Combined_Files)")
 
     parser.add_argument("--skip-confirm", action="store_true", help="Skip confirmation prompts")
 
     return parser.parse_args()
-
-
-def clear_screen() -> None:
-    os.system("cls" if os.name == "nt" else "clear")
 
 
 def pause(skip_confirm: bool = False) -> None:
@@ -39,11 +34,11 @@ def delete_files(base_path: Path, file_paths: list[Path]) -> None:
             if full_path.exists():
                 full_path.unlink()
                 print(f"Deleted: {full_path}")
-        except Exception as e:
+        except FileNotFoundError as e:
             print(f"Error deleting {full_path}: {e}")
 
 
-def robocopy_folder(source_path, dest_path):
+def robocopy_folder(source_path: Path, dest_path: Path) -> None:
     """Execute robocopy command for the specified folders."""
     print(f"\nCopying files from {source_path.name} to {dest_path.name}...")
 
@@ -61,7 +56,7 @@ def robocopy_folder(source_path, dest_path):
         raise
 
 
-def validate_paths(args):
+def validate_paths(args: argparse.Namespace) -> tuple[Path, Path]:
     """Validate that all required paths exist."""
     base_path = Path(args.base_path)
     if not base_path.exists():
@@ -76,13 +71,13 @@ def validate_paths(args):
         raise FileNotFoundError(f"Missing required directories: {', '.join(missing_dirs)}")
 
     # Create combined directory if it doesn't exist
-    combined_path = base_path / args.combined_dir
+    combined_path = Path(args.combined_dir)
     combined_path.mkdir(exist_ok=True)
 
     return base_path, combined_path
 
 
-def main():
+def main() -> None:
     args = parse_arguments()
 
     try:
@@ -160,32 +155,32 @@ def main():
         Path(r"02_Langley\textures\architecture\buildings\Plaster02_d.DDS"),
         Path(r"02_Langley\textures\architecture\buildings\Plaster02_n.DDS"),
         Path(r"02_Langley\textures\architecture\buildings\Plaster02_s.DDS"),
-        r"02_Langley\textures\architecture\buildings\ResAwningFabric01_d.DDS"
-        r"02_Langley\textures\architecture\buildings\ResAwningFabric01_n.DDS"
-        r"02_Langley\textures\architecture\buildings\ResAwningFabric01_s.DDS"
-        r"02_Langley\textures\architecture\buildings\ResAwningFabric02_d.DDS"
-        r"02_Langley\textures\architecture\buildings\resawningfabric03_d.DDS"
-        r"02_Langley\textures\architecture\buildings\resawningfabric03_s.DDS"
-        r"02_Langley\textures\architecture\buildings\ResAwningFabric04_d.DDS"
-        r"02_Langley\textures\architecture\buildings\WoodFloor01_d.DDS"
-        r"02_Langley\textures\architecture\buildings\WoodFloor01_n.DDS"
-        r"02_Langley\textures\architecture\buildings\WoodFloor01_s.DDS"
-        r"02_Langley\textures\interiors\building\bldwoodfloor01_d.dds"
-        r"02_Langley\textures\interiors\building\bldwoodfloor01_n.dds"
-        r"02_Langley\textures\interiors\building\bldwoodfloor01_s.dds"
-        r"02_Langley\textures\SetDressing\WoodFederalistFurniture01_d.DDS"
-        r"02_Langley\textures\SetDressing\WoodFederalistFurniture01_n.DDS"
-        r"02_Langley\textures\SetDressing\WoodFederalistFurniture01_s.DDS"
-        r"02_Langley\materials\architecture\buildings\BrickBrownstone01.bgsm"
-        r"02_Langley\materials\architecture\buildings\BrickBrownstonePainted01.bgsm"
-        r"02_Langley\materials\architecture\buildings\BrickBrownstonePainted02.bgsm"
-        r"02_Langley\materials\architecture\buildings\BrickGreenLt01.bgsm"
-        r"02_Langley\materials\architecture\buildings\BrickRed01.BGSM"
-        r"02_Langley\materials\architecture\buildings\BrickRedDamageDecal01.BGSM"
-        r"02_Langley\materials\architecture\buildings\BricksFactory01.BGSM"
-        r"02_Langley\materials\architecture\buildings\BrickSolidWhitePaint01.bgsm"
-        r"02_Langley\materials\architecture\buildings\BrickTan01.BGSM"
-        r"02_Langley\materials\architecture\buildings\BrickTanLt01.bgsm",
+        Path(r"02_Langley\textures\architecture\buildings\ResAwningFabric01_d.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\ResAwningFabric01_n.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\ResAwningFabric01_s.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\ResAwningFabric02_d.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\resawningfabric03_d.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\resawningfabric03_s.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\ResAwningFabric04_d.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\WoodFloor01_d.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\WoodFloor01_n.DDS"),
+        Path(r"02_Langley\textures\architecture\buildings\WoodFloor01_s.DDS"),
+        Path(r"02_Langley\textures\interiors\building\bldwoodfloor01_d.dds"),
+        Path(r"02_Langley\textures\interiors\building\bldwoodfloor01_n.dds"),
+        Path(r"02_Langley\textures\interiors\building\bldwoodfloor01_s.dds"),
+        Path(r"02_Langley\textures\SetDressing\WoodFederalistFurniture01_d.DDS"),
+        Path(r"02_Langley\textures\SetDressing\WoodFederalistFurniture01_n.DDS"),
+        Path(r"02_Langley\textures\SetDressing\WoodFederalistFurniture01_s.DDS"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickBrownstone01.bgsm"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickBrownstonePainted01.bgsm"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickBrownstonePainted02.bgsm"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickGreenLt01.bgsm"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickRed01.BGSM"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickRedDamageDecal01.BGSM"),
+        Path(r"02_Langley\materials\architecture\buildings\BricksFactory01.BGSM"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickSolidWhitePaint01.bgsm"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickTan01.BGSM"),
+        Path(r"02_Langley\materials\architecture\buildings\BrickTanLt01.bgsm"),
     ]
 
     print("\nDeleting conflicting FlaconOil files...")
@@ -227,8 +222,22 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\nOperation cancelled by user.")
         sys.exit(1)
-    except Exception as e:
-        print(f"\nAn error occurred: {e}")
-        print("Please check the paths and permissions and try again.")
+    except FileNotFoundError as e:
+        print(f"\nFile not found error: {e}")
+        print("Please check the paths and try again.")
+        input("\nPress Enter to exit...")
+        sys.exit(1)
+    except PermissionError as e:
+        print(f"\nPermission error: {e}")
+        print("Please check your permissions and try again.")
+        input("\nPress Enter to exit...")
+        sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        print(f"\nSubprocess error: {e}")
+        print("There was an error with a subprocess call.")
+        input("\nPress Enter to exit...")
+        sys.exit(1)
+    except Exception as e:  # noqa: BLE001
+        print(f"\nAn unexpected error occurred: {e}")
         input("\nPress Enter to exit...")
         sys.exit(1)
